@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken"
 import User from "../models/UserModel.mjs";
+import { verifyJwt } from "../utils/tokens.mjs";
 
 const tokenVerfication = async (req, res, next) => {
     try {
@@ -7,7 +7,7 @@ const tokenVerfication = async (req, res, next) => {
 
         if (!token) return res.status(404).json({ success: false, msg: "no token provided" });
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const decoded = verifyJwt(token, process.env.JWT_SECRET_KEY);
 
         req.payload = decoded;
 

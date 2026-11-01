@@ -1,6 +1,5 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { body } from "express-validator";
 import User from "../models/UserModel.mjs";
 import {
@@ -8,7 +7,7 @@ import {
     loginValidation,
 } from "../middlewares/authValid.mjs";
 import validateResult from "../middlewares/checkValid.mjs";
-import { createToken, hashToken, expiryDate } from "../utils/tokens.mjs";
+import { createToken, hashToken, expiryDate, signJwt } from "../utils/tokens.mjs";
 import { buildAuthLinks, sendAuthEmail, buildAuthEmail } from "../utils/mailer.mjs";
 
 function localeFrom(req) {
@@ -29,7 +28,7 @@ async function dispatchAuthMail(req, kind, to, url) {
 const authRoutes = Router();
 
 function tokenResponse(user) {
-    const token = jwt.sign(
+    const token = signJwt(
         { userId: user.id },
         process.env.JWT_SECRET_KEY,
         { expiresIn: "7d" }
