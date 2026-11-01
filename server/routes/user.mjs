@@ -10,7 +10,7 @@ import { workoutIDPathValidation, workoutBodyValidation } from "../middlewares/w
 import validateResult from "../middlewares/checkValid.mjs";
 import { recordValidation } from "../middlewares/workoutValid.mjs";
 
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { body } from "express-validator";
 import { calcBmi, calcTdee, calorieTarget, todayKey, buildDailyPlan, buildMealPlan, buildInsights, bmiCategory, weekStats } from "../utils/fitness.mjs";
 import { buildAnalytics } from "../utils/analytics.mjs";
