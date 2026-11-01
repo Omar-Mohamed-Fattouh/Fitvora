@@ -23,6 +23,7 @@ const allowedOrigins = new Set(
   [
     process.env.CLIENT_URL,
     "https://fitvora-lime.vercel.app",
+    "https://fitvoraa.vercel.app",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     ...extraOrigins,
