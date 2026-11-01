@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /activity
+Disallow: /workouts
+Disallow: /nutrition
+Disallow: /health-info
+Disallow: /settings
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /reset-password
+
+Sitemap: /sitemap.xml
