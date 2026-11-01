@@ -3,16 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import api from "../lib/api";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  CheckCircle,
-} from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useUser } from "../contexts/UserContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import Seo from "../components/Seo";
@@ -131,12 +122,7 @@ const Login = () => {
             aria-describedby="email-error"
           />
           {errors.email && (
-            <p
-              id="email-error"
-              className="mt-1 text-sm text-red-600 flex items-center"
-              role="alert"
-            >
-              <AlertCircle className="mr-2" size={16} />
+            <p id="email-error" className="field-error" role="alert">
               {t(errors.email.message)}
             </p>
           )}
@@ -159,20 +145,14 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="fav-btn"
-              style={{ position: "absolute", insetInlineEnd: "0.6rem", top: "0.7rem" }}
+              className="text-btn field-reveal"
               aria-label={showPassword ? t("hidePassword") : t("showPassword")}
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showPassword ? t("hidePassword") : t("showPassword")}
             </button>
           </div>
           {errors.password && (
-            <p
-              id="password-error"
-              className="mt-1 text-sm text-red-600 flex items-center"
-              role="alert"
-            >
-              <AlertCircle className="mr-2" size={16} />
+            <p id="password-error" className="field-error" role="alert">
               {t(errors.password.message)}
             </p>
           )}

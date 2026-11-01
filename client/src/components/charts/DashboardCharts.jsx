@@ -211,6 +211,7 @@ const DashboardCharts = ({ analytics }) => {
       <section className="dash-card span-7">
         <h3>{t("consistency")}</h3>
         <p>{t("heatmapHint")}</p>
+        <div className="heat-wrap">
         <div className="heat-grid" role="img" aria-label={t("consistency")}>
           {heatmap.map((day) => (
             <span
@@ -219,6 +220,7 @@ const DashboardCharts = ({ analytics }) => {
               className={`heat heat-${Math.min(day.count, 3)}`}
             />
           ))}
+        </div>
         </div>
       </section>
     </div>
