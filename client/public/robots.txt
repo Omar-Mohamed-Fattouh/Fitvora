@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /share.jpg
+Allow: /og.png
+Allow: /icon-512.png
 Disallow: /dashboard
 Disallow: /activity
 Disallow: /workouts
@@ -12,4 +15,4 @@ Disallow: /forgot-password
 Disallow: /verify-email
 Disallow: /reset-password
 
-Sitemap: /sitemap.xml
+Sitemap: https://fitvoraa.vercel.app/sitemap.xml

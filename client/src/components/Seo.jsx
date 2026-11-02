@@ -9,7 +9,7 @@ const Seo = ({ titleKey, descKey, path = "/" }) => {
   useEffect(() => {
     const origin = window.location.origin;
     const url = `${origin}${path}`;
-    const image = `${origin}/og.png`;
+    const image = `${origin}/share.jpg`;
     document.title = title;
     const setMeta = (selector, attr, value) => {
       const node = document.querySelector(selector);
@@ -25,6 +25,9 @@ const Seo = ({ titleKey, descKey, path = "/" }) => {
     setMeta('meta[name="twitter:title"]', "content", title);
     setMeta('meta[name="twitter:description"]', "content", description);
     setMeta('meta[name="twitter:image"]', "content", image);
+    setMeta('meta[itemprop="image"]', "content", image);
+    const imageSrc = document.querySelector('link[rel="image_src"]');
+    if (imageSrc) imageSrc.setAttribute("href", image);
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute("href", url);
   }, [title, description, lang, path]);

@@ -1,36 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Fitvora — training, nutrition, and progress</title>
-    <meta name="description" content="A training platform for workouts, meals, and weigh-ins. Plan and progress on one page." />
+    <meta name="description" content="Log workouts, meals, and weigh-ins in one private Fitvora account. Daily plans and progress from what you actually record." />
     <meta name="theme-color" content="#f3efe6" />
     <meta name="color-scheme" content="light" />
-    <meta name="robots" content="index,follow" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="googlebot" content="index,follow" />
     <meta name="author" content="Fitvora" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="canonical" href="https://fitvoraa.vercel.app/" />
+    <link rel="alternate" hreflang="en" href="https://fitvoraa.vercel.app/" />
+    <link rel="alternate" hreflang="ar" href="https://fitvoraa.vercel.app/" />
+    <link rel="alternate" hreflang="x-default" href="https://fitvoraa.vercel.app/" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="image_src" href="https://fitvoraa.vercel.app/share.jpg" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fitvora" />
     <meta property="og:title" content="Fitvora — training, nutrition, and progress" />
-    <meta property="og:description" content="A training platform for workouts, meals, and weigh-ins." />
+    <meta property="og:description" content="Log workouts, meals, and weigh-ins in one private Fitvora account." />
     <meta property="og:url" content="https://fitvoraa.vercel.app/" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content="https://fitvoraa.vercel.app/og.png" />
-    <meta property="og:image:secure_url" content="https://fitvoraa.vercel.app/og.png" />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:locale:alternate" content="ar_EG" />
+    <meta property="og:image" content="https://fitvoraa.vercel.app/share.jpg" />
+    <meta property="og:image:secure_url" content="https://fitvoraa.vercel.app/share.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Fitvora" />
+    <meta itemprop="name" content="Fitvora" />
+    <meta itemprop="description" content="Log workouts, meals, and weigh-ins in one private Fitvora account." />
+    <meta itemprop="image" content="https://fitvoraa.vercel.app/share.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fitvora — training, nutrition, and progress" />
-    <meta name="twitter:description" content="A training platform for workouts, meals, and weigh-ins." />
-    <meta name="twitter:image" content="https://fitvoraa.vercel.app/og.png" />
+    <meta name="twitter:description" content="Log workouts, meals, and weigh-ins in one private Fitvora account." />
+    <meta name="twitter:image" content="https://fitvoraa.vercel.app/share.jpg" />
     <meta name="twitter:image:alt" content="Fitvora" />
     <script type="application/ld+json">
       {
@@ -38,12 +47,23 @@
         "@type": "WebApplication",
         "name": "Fitvora",
         "url": "https://fitvoraa.vercel.app/",
-        "image": "https://fitvoraa.vercel.app/og.png",
+        "image": "https://fitvoraa.vercel.app/share.jpg",
         "logo": "https://fitvoraa.vercel.app/icon-512.png",
         "applicationCategory": "HealthApplication",
         "operatingSystem": "Web",
-        "description": "A training platform for sessions, meals, and weigh-ins.",
-        "inLanguage": ["en", "ar"]
+        "description": "Log workouts, meals, and weigh-ins in one private Fitvora account. Daily plans and progress from what you actually record.",
+        "inLanguage": ["en", "ar"],
+        "publisher": {
+          "@type": "Organization",
+          "name": "Fitvora",
+          "url": "https://fitvoraa.vercel.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://fitvoraa.vercel.app/icon-512.png",
+            "width": 512,
+            "height": 512
+          }
+        }
       }
     </script>
   </head>
