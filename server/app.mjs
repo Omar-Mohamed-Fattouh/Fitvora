@@ -51,7 +51,7 @@ export function connectDb() {
   if (!dbReady) {
     dbReady = mongoose.connect(process.env.DATABASE_URL).then(async (connection) => {
       console.log("connected to MongoDB");
-      if (process.env.SKIP_SEED !== "true") {
+      if (process.env.SKIP_SEED !== "true" && process.env.VERCEL !== "1") {
         await seedCatalog();
       }
       return connection;

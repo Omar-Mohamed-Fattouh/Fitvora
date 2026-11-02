@@ -335,7 +335,6 @@ userRoutes.put("/workout/:pageNum",
             if (foundExercises.length !== exerciseIds.length) {
                 const foundIds = foundExercises.map(e => e._id.toString());
                 const missingIds = exerciseIds.filter(id => !foundIds.includes(id));
-                console.log(foundIds, missingIds)
                 return res.status(400).json({
                     success: false,
                     msg: "Some exercise IDs are not exist or incorrect",

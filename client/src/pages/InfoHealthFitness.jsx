@@ -72,8 +72,8 @@ const InfoHealthFitness = () => {
                 if (value) setValue(key, value);
               });
             }
-          } catch (error) {
-            console.log("No existing health info found");
+          } catch {
+            // First visit: the form stays empty until they save.
           }
           return;
         }
@@ -95,8 +95,8 @@ const InfoHealthFitness = () => {
                 if (value) setValue(key, value);
               });
             }
-          } catch (error) {
-            console.log("No existing health info found");
+          } catch {
+            // First visit: the form stays empty until they save.
           }
         } else {
           navigate('/login');
