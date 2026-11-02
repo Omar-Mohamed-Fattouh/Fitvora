@@ -10,9 +10,6 @@ import { useLanguage } from "../contexts/LanguageContext";
 import Seo from "../components/Seo";
 import PasswordReveal from "../components/PasswordReveal";
 
-const DEMO_EMAIL = "omarmfattouh45@gmail.com";
-const DEMO_PASSWORD = "Omar01284$$";
-
 const loginSchema = yup.object({
   email: yup.string().email("invalidEmail").required("emailRequired"),
   password: yup.string().required("passwordRequired"),
@@ -35,10 +32,6 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(loginSchema),
     mode: "onTouched",
-    defaultValues: {
-      email: DEMO_EMAIL,
-      password: DEMO_PASSWORD,
-    },
   });
 
   const onSubmit = async (data) => {
