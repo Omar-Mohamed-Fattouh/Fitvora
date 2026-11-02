@@ -1,16 +1,19 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
-import { useLanguage } from "../contexts/LanguageContext";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useUser();
-  const { t } = useLanguage();
+  const hasToken = Boolean(localStorage.getItem("authToken"));
 
-  if (loading) {
-    return <div className="dash-loading">{t("loading")}</div>;
+  if (!hasToken && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!loading && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

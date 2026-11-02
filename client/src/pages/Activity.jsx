@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Seo from "../components/Seo";
 import api from "../lib/api";
 import { useLanguage } from "../contexts/LanguageContext";
+import PageSkeleton from "../components/PageSkeleton";
 
 const typeKey = {
   cardio: "mixCardio",
@@ -15,6 +16,7 @@ const typeKey = {
 const Activity = () => {
   const { t, lang } = useLanguage();
   const [records, setRecords] = useState([]);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -25,7 +27,8 @@ const Activity = () => {
         );
         setRecords(list);
       })
-      .catch(() => setError(t("workoutsLoadError")));
+      .catch(() => setError(t("workoutsLoadError")))
+      .finally(() => setReady(true));
   }, [t]);
 
   const locale = lang === "ar" ? "ar" : "en-GB";
@@ -40,7 +43,9 @@ const Activity = () => {
         </div>
       </header>
       {error && <p className="dash-alert" role="alert">{error}</p>}
-      {records.length === 0 ? (
+      {!ready ? (
+        <PageSkeleton variant="table" />
+      ) : records.length === 0 ? (
         <p className="dash-muted">{t("emptyHistory")}</p>
       ) : (
         <div className="table-wrap">

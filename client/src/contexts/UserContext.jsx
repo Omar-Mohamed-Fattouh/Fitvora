@@ -6,7 +6,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [healthInfo, setHealthInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("authToken")));
 
   const fetchUserData = async () => {
     const authToken = localStorage.getItem("authToken");

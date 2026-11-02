@@ -7,6 +7,9 @@ const Seo = ({ titleKey, descKey, path = "/" }) => {
   const description = descKey ? t(descKey) : t("seoHomeDesc");
 
   useEffect(() => {
+    const origin = window.location.origin;
+    const url = `${origin}${path}`;
+    const image = `${origin}/icon-512.png`;
     document.title = title;
     const setMeta = (selector, attr, value) => {
       const node = document.querySelector(selector);
@@ -16,10 +19,12 @@ const Seo = ({ titleKey, descKey, path = "/" }) => {
     setMeta('meta[property="og:title"]', "content", title);
     setMeta('meta[property="og:description"]', "content", description);
     setMeta('meta[property="og:locale"]', "content", lang === "ar" ? "ar_EG" : "en_US");
+    setMeta('meta[property="og:url"]', "content", url);
+    setMeta('meta[property="og:image"]', "content", image);
     setMeta('meta[name="twitter:title"]', "content", title);
     setMeta('meta[name="twitter:description"]', "content", description);
     const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute("href", `${window.location.origin}${path}`);
+    if (canonical) canonical.setAttribute("href", url);
   }, [title, description, lang, path]);
 
   return null;

@@ -85,7 +85,7 @@ const Login = () => {
       <p className="lead">{t("brandTag")}</p>
       {formError && <p className="notice bad" role="alert">{formError}</p>}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate aria-busy={loading}>
         <div>
           <label htmlFor="email" className="field-label">{t("email")}</label>
           <input

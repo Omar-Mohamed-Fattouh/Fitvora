@@ -5,6 +5,7 @@ import api from "../lib/api";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useUser } from "../contexts/UserContext";
 import WorkoutCard from "../components/dashboard/WorkoutCard";
+import PageSkeleton from "../components/PageSkeleton";
 
 const DashboardCharts = lazy(() => import("../components/charts/DashboardCharts"));
 
@@ -110,7 +111,7 @@ const Dashboard = () => {
   };
 
   if (loading || !summary) {
-    return <div className="dash-loading" role="status">{t("loading")}</div>;
+    return <PageSkeleton variant="dashboard" />;
   }
 
   const healthInfo = summary.healthInfo || {};
@@ -188,8 +189,8 @@ const Dashboard = () => {
         </article>
       </section>
 
-      <Suspense fallback={<p className="dash-muted">{t("loading")}</p>}>
-        {analytics && <DashboardCharts analytics={analytics} />}
+      <Suspense fallback={<PageSkeleton variant="charts" />}>
+        {analytics ? <DashboardCharts analytics={analytics} /> : <PageSkeleton variant="charts" />}
       </Suspense>
 
       <section className="split-3">

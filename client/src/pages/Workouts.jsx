@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import api from "../lib/api";
 import { useLanguage } from "../contexts/LanguageContext";
 import Seo from "../components/Seo";
+import PageSkeleton from "../components/PageSkeleton";
 
 const Workouts = () => {
   const [exercises, setExercises] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [muscle, setMuscle] = useState("all");
@@ -23,6 +25,8 @@ const Workouts = () => {
         setPlans(summary.data.plan || []);
       } catch {
         setError(t("workoutsLoadError"));
+      } finally {
+        setReady(true);
       }
     };
     load();
@@ -71,6 +75,10 @@ const Workouts = () => {
   ));
 
   const done = plans.filter((item) => item.completed).length;
+
+  if (!ready) {
+    return <PageSkeleton variant="cards" />;
+  }
 
   return (
     <div className="dash-page">

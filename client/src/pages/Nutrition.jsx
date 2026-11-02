@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import api from "../lib/api";
 import { useLanguage } from "../contexts/LanguageContext";
 import Seo from "../components/Seo";
+import PageSkeleton from "../components/PageSkeleton";
 
 const Nutrition = () => {
   const [meals, setMeals] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [summary, setSummary] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [ready, setReady] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const { t } = useLanguage();
@@ -24,7 +26,9 @@ const Nutrition = () => {
   };
 
   useEffect(() => {
-    load().catch(() => setError(t("nutritionLoadError")));
+    load()
+      .catch(() => setError(t("nutritionLoadError")))
+      .finally(() => setReady(true));
   }, []);
 
   const isFav = (id) => favorites.some((meal) => meal._id === id);
@@ -56,6 +60,10 @@ const Nutrition = () => {
   const eaten = summary?.daily?.caloriesLogged || 0;
   const target = summary?.metrics?.calorieTarget || 0;
   const percent = target ? Math.min(100, Math.round((eaten / target) * 100)) : 0;
+
+  if (!ready) {
+    return <PageSkeleton variant="cards" />;
+  }
 
   return (
     <div className="dash-page">

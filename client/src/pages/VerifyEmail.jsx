@@ -53,7 +53,13 @@ const VerifyEmail = () => {
     <div className="auth-card">
       <h1>{t("verifyEmail")}</h1>
       <p className="lead">{t("verifySent", { email: email || "inbox" })}</p>
-      {status === "verifying" && <p>{t("verifying")}</p>}
+      {status === "verifying" && (
+        <div className="skel-page skel-auth" role="status" aria-live="polite" aria-busy="true">
+          <span className="sr-only">{t("verifying")}</span>
+          <i className="h-14" />
+          <i className="h-14 w-70" />
+        </div>
+      )}
       {status === "success" && <p className="notice ok">{message}</p>}
       {status === "error" && <p className="notice bad">{message}</p>}
       {status === "pending" && (
