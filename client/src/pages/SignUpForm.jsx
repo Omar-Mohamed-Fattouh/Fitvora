@@ -64,6 +64,8 @@ const SignUpForm = () => {
     handleSubmit,
     trigger,
     setError,
+    setValue,
+    getValues,
     formState: { errors },
     watch
   } = useForm({
@@ -188,9 +190,12 @@ const SignUpForm = () => {
 
   const nextStep = async () => {
     const valid = await trigger(["fullName", "phoneNumber", "gender", "dateOfBirth"]);
-    if (valid) {
-      setStep(2);
+    if (!valid) return;
+    const { fullName, email } = getValues();
+    if (email && fullName && email.trim() === String(fullName).trim()) {
+      setValue("email", "");
     }
+    setStep(2);
   };
 
   const prevStep = () => {
@@ -216,8 +221,20 @@ const SignUpForm = () => {
       </div>
       <p className="dash-muted">{step === 1 ? t("personalInfo") : t("accountDetails")}</p>
 
-      {step === 1 ? (
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="space-y-4"
+        autoComplete="on"
+        noValidate
+        onSubmit={(event) => {
+          if (step === 1) {
+            event.preventDefault();
+            nextStep();
+            return;
+          }
+          handleSubmit(onSubmit)(event);
+        }}
+      >
+        <div className="space-y-4" hidden={step !== 1}>
           <div>
             <label htmlFor="fullName" className="field-label">{t("fullName")}</label>
             <input
@@ -287,14 +304,16 @@ const SignUpForm = () => {
           <button type="button" onClick={nextStep} className="ink-btn wide">
             {t("next")}
           </button>
-        </form>
-      ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        </div>
+
+        <div className="space-y-4" hidden={step !== 2}>
           <div>
-            <label htmlFor="email" className="field-label">{t("email")}</label>
+            <label htmlFor="signup-email" className="field-label">{t("email")}</label>
             <input
-              id="email"
+              id="signup-email"
               type="email"
+              inputMode="email"
+              spellCheck={false}
               autoComplete="email"
               {...register("email")}
               className={`field ${errors.email || fieldErrors.email ? "is-bad" : ""}`}
@@ -365,8 +384,8 @@ const SignUpForm = () => {
               {loading ? t("saving") : t("signUp")}
             </button>
           </div>
-        </form>
-      )}
+        </div>
+      </form>
 
       {/* Login Link */}
       <p className="dash-muted" style={{ marginTop: "1rem" }}>
