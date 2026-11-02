@@ -1,65 +1,64 @@
 import { body } from "express-validator";
+import { normalizeAccountEmail, normalizePhone } from "../utils/account.mjs";
 
 export const regestValidation = [
     body("name")
         .exists()
-        .withMessage("Name is required")
+        .withMessage("nameRequired")
         .trim()
         .isLength({ min: 3, max: 16 })
-        .withMessage("Name must be between 3 and 16 characters"),
+        .withMessage("nameLength"),
 
     body("email")
         .exists()
-        .withMessage("Email is required")
+        .withMessage("emailRequired")
+        .customSanitizer(normalizeAccountEmail)
         .isEmail()
-        .withMessage("Email must be valid")
-        .normalizeEmail(),
+        .withMessage("invalidEmail"),
 
     body("password")
         .exists()
-        .withMessage("password is required")
+        .withMessage("passwordRequired")
         .isLength({ min: 8 })
-        .withMessage("Password must be at least 8 characters")
+        .withMessage("passwordMin")
         .matches(/\d/)
-        .withMessage("Password must contain a number")
+        .withMessage("passwordNumber")
         .matches(/[A-Z]/)
-        .withMessage("Password must contain an uppercase letter")
+        .withMessage("passwordUpper")
         .matches(/[@$!%*?&]/)
-        .withMessage("Password must contain a special character"),
+        .withMessage("passwordSpecial"),
 
     body("phone")
         .exists()
-        .withMessage("Phone is required")
-        .matches(/^\+[1-9]{1}[0-9]{3,14}$/)
-        .withMessage(
-            'Phone number must start with a "+" followed by the country code and the phone number'
-        )
-        .trim(),
+        .withMessage("phoneRequired")
+        .customSanitizer(normalizePhone)
+        .matches(/^\+[1-9]\d{6,14}$/)
+        .withMessage("phoneInvalid"),
 
     body("gender")
         .exists()
-        .withMessage("Gender is required")
+        .withMessage("genderRequired")
         .isIn(["male", "female"])
-        .withMessage("Gender must be 'male' or 'female'"),
+        .withMessage("genderInvalid"),
 
     body("birthDate")
         .exists()
-        .withMessage("Birth date is required")
+        .withMessage("dobRequired")
         .isISO8601()
-        .withMessage("Birth date must be a valid ISO 8601 date (YYYY-MM-DD)"),
+        .withMessage("dobInvalid"),
 ];
 
 export const loginValidation = [
     body("email")
         .exists()
-        .withMessage("Email is required")
+        .withMessage("emailRequired")
+        .customSanitizer(normalizeAccountEmail)
         .isEmail()
-        .withMessage("Email must be valid")
-        .normalizeEmail(),
+        .withMessage("invalidEmail"),
 
     body("password")
         .exists()
-        .withMessage("Password is required")
+        .withMessage("passwordRequired")
         .isLength({ min: 8 })
-        .withMessage("Password must be at least 8 characters long"),
+        .withMessage("passwordMin"),
 ];

@@ -38,6 +38,15 @@ const Welcome = () => {
         ))}
       </dl>
 
+      <section className="feature-grid" aria-label={t("welcomeFeaturesTitle")}>
+        {[1, 2, 3].map((index) => (
+          <article key={index}>
+            <h2>{t(`welcomeFeature${index}Title`)}</h2>
+            <p>{t(`welcomeFeature${index}Text`)}</p>
+          </article>
+        ))}
+      </section>
+
       <section className="method">
         <h2>{t("methodTitle")}</h2>
         <ol>
@@ -48,15 +57,6 @@ const Welcome = () => {
             </li>
           ))}
         </ol>
-      </section>
-
-      <section className="rules">
-        <h2>{t("ruleTitle")}</h2>
-        <ul>
-          <li>{t("rule1")}</li>
-          <li>{t("rule2")}</li>
-          <li>{t("rule3")}</li>
-        </ul>
       </section>
 
       <p className="closing">{t("closingLine")}</p>

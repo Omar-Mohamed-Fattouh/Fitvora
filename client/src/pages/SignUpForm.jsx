@@ -3,9 +3,20 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useState, useEffect } from "react";
 import api from "../lib/api";
+import { readApiError } from "../lib/errors";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useUser } from "../contexts/UserContext";
 import Seo from "../components/Seo";
+
+function toE164(phone) {
+  let value = String(phone || "").trim().replace(/[^\d+]/g, "");
+  if (value.startsWith("00")) value = `+${value.slice(2)}`;
+  if (/^01\d{9}$/.test(value)) value = `+2${value}`;
+  if (/^1\d{9}$/.test(value)) value = `+20${value}`;
+  if (value && !value.startsWith("+")) value = `+${value}`;
+  return value;
+}
 
 const signUpSchema = yup.object().shape({
   fullName: yup.string().max(16).required("nameRequired"),
@@ -49,6 +60,7 @@ const SignUpForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useUser();
 
   const {
     register,
@@ -89,10 +101,9 @@ const SignUpForm = () => {
     try {
       const payload = {
         name: data.fullName,
-        email: data.email,
+        email: data.email.trim(),
         password: data.password,
-        phoneCode: "+1",
-        phone: data.phoneNumber,
+        phone: toE164(data.phoneNumber),
         gender: data.gender,
         birthDate: data.dateOfBirth instanceof Date
           ? data.dateOfBirth.toISOString().split("T")[0]
@@ -105,6 +116,15 @@ const SignUpForm = () => {
         localStorage.setItem("userEmail", data.email);
         localStorage.setItem("userName", data.fullName);
         setSuccess(true);
+        if (response.data.token) {
+          await login(response.data.token, {
+            ...response.data,
+            name: data.fullName,
+            email: data.email,
+          });
+          navigate("/dashboard", { replace: true, state: { fromSignup: true } });
+          return;
+        }
         navigate("/verify-email", {
           state: {
             email: data.email,
@@ -116,41 +136,34 @@ const SignUpForm = () => {
         });
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      
-      if (error.response) {
-        // Handle field-specific errors from API
-        if (error.response.data.errors) {
-          error.response.data.errors.forEach(err => {
-            setFieldErrors(prev => ({
-              ...prev,
-              [err.field]: err.message
-            }));
-            setError(err.field, {
-              type: "manual",
-              message: err.message
-            });
+      const apiError = readApiError(error, "serverError");
+      if (apiError.fields.length) {
+        apiError.fields.forEach((fieldError) => {
+          const field = fieldError.field === "phone"
+            ? "phoneNumber"
+            : fieldError.field === "name"
+              ? "fullName"
+              : fieldError.field;
+          setFieldErrors((prev) => ({
+            ...prev,
+            [field]: fieldError.key,
+          }));
+          setError(field, {
+            type: "manual",
+            message: fieldError.key,
           });
-        } 
-        // Handle generic error messages
-        else if (error.response.data.msg) {
-          if (error.response.status === 409) {
-            setFieldErrors(prev => ({
-              ...prev,
-              email: error.response.data.msg
-            }));
-            setError("email", {
-              type: "manual",
-              message: error.response.data.msg
-            });
-          } else {
-            setErrorMessage(error.response.data.msg);
-          }
-        } else {
-          setErrorMessage("An error occurred. Please try again.");
-        }
+        });
+      } else if (error.response?.status === 409) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: apiError.key,
+        }));
+        setError("email", {
+          type: "manual",
+          message: apiError.key,
+        });
       } else {
-        setErrorMessage("Network error. Please check your connection.");
+        setErrorMessage(t(apiError.key));
       }
     } finally {
       setLoading(false);

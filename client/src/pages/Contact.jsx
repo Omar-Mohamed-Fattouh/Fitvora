@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Seo from "../components/Seo";
 import api from "../lib/api";
+import { readApiError } from "../lib/errors";
 import { useLanguage } from "../contexts/LanguageContext";
 
 const Contact = () => {
@@ -23,8 +24,8 @@ const Contact = () => {
       });
       setStatus(t("contactSent"));
       event.currentTarget.reset();
-    } catch {
-      setError(t("contactError"));
+    } catch (error) {
+      setError(t(readApiError(error, "contactError").key));
     } finally {
       setSending(false);
     }

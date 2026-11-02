@@ -4,6 +4,14 @@ import nodemailer from "nodemailer";
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5174";
 
+export function hasSmtp() {
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+}
+
+function isProduction() {
+  return process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+}
+
 export function buildAuthLinks(kind, token) {
   if (kind === "verify") {
     return `${CLIENT_URL}/verify-email?token=${token}`;
@@ -38,9 +46,10 @@ function emailCopy(locale, kind, url) {
 }
 
 let cachedTransport;
+let transportResolved = false;
 
 async function createTransport() {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  if (hasSmtp()) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
@@ -50,6 +59,10 @@ async function createTransport() {
         pass: process.env.SMTP_PASS,
       },
     });
+  }
+
+  if (isProduction()) {
+    return null;
   }
 
   const cachePath = path.join(process.cwd(), ".ethereal.json");
@@ -71,7 +84,10 @@ async function createTransport() {
 }
 
 async function getTransport() {
-  if (!cachedTransport) cachedTransport = await createTransport();
+  if (!transportResolved) {
+    cachedTransport = await createTransport();
+    transportResolved = true;
+  }
   return cachedTransport;
 }
 
@@ -82,6 +98,10 @@ export function buildAuthEmail(kind, url, locale = "en") {
 export async function sendAuthEmail({ to, subject, text, html }) {
   try {
     const transporter = await getTransport();
+    if (!transporter) {
+      console.log("Email skipped: SMTP is not configured.");
+      return { delivered: false, skipped: true };
+    }
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || "Fitvora <no-reply@fitvora.app>",
       to,

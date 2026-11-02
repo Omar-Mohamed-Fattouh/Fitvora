@@ -33,12 +33,11 @@ const PageLoader = () => {
   );
 };
 
-const ErrorFallback = ({ error, resetErrorBoundary }) => {
+const ErrorFallback = ({ resetErrorBoundary }) => {
   const { t } = useLanguage();
   return (
     <div role="alert" className="prose-page">
       <p>{t("somethingWrong")}</p>
-      <pre>{error.message}</pre>
       <button type="button" className="ink-btn" onClick={resetErrorBoundary}>{t("tryAgain")}</button>
     </div>
   );

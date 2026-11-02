@@ -8,7 +8,8 @@ import {
 } from "../middlewares/authValid.mjs";
 import validateResult from "../middlewares/checkValid.mjs";
 import { createToken, hashToken, expiryDate, signJwt } from "../utils/tokens.mjs";
-import { buildAuthLinks, sendAuthEmail, buildAuthEmail } from "../utils/mailer.mjs";
+import { buildAuthLinks, sendAuthEmail, buildAuthEmail, hasSmtp } from "../utils/mailer.mjs";
+import { normalizeAccountEmail, escapeRegex } from "../utils/account.mjs";
 
 function localeFrom(req) {
     const raw = req.body?.locale || req.headers["accept-language"] || "en";
@@ -26,6 +27,22 @@ async function dispatchAuthMail(req, kind, to, url) {
 }
 
 const authRoutes = Router();
+
+async function findAccount(email) {
+    const normalized = normalizeAccountEmail(email);
+    return (
+        (await User.findOne({ email: normalized })) ||
+        (await User.findOne({ email: new RegExp(`^${escapeRegex(normalized)}$`, "i") }))
+    );
+}
+
+async function passwordsMatch(plain, hash) {
+    if (!plain || !hash) return false;
+    if (await bcrypt.compare(plain, hash)) return true;
+    const trimmed = String(plain).trim();
+    if (trimmed === plain) return false;
+    return bcrypt.compare(trimmed, hash);
+}
 
 function tokenResponse(user) {
     const token = signJwt(
@@ -55,34 +72,57 @@ authRoutes.post(
     validateResult,
     async (req, res, next) => {
         try {
-            const { name, email, password, phone, gender, birthDate } = req.body;
+            const { name, password, phone, gender, birthDate } = req.body;
+            const email = normalizeAccountEmail(req.body.email);
 
-            const checkEmail = await User.findOne({ email }).exec();
+            const checkEmail = await findAccount(email);
             if (checkEmail) {
                 return res.status(409).json({
                     success: false,
-                    msg: "this email already exists",
+                    code: "EMAIL_EXISTS",
+                    msg: "emailExists",
                 });
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
             const rawToken = createToken();
+            const mailConfigured = hasSmtp();
 
             const newUser = await User.create({
                 email,
                 password: hashedPassword,
-                isVerified: false,
-                verificationToken: hashToken(rawToken),
-                verificationExpires: expiryDate(24 * 60),
+                isVerified: !mailConfigured,
+                verificationToken: mailConfigured ? hashToken(rawToken) : undefined,
+                verificationExpires: mailConfigured ? expiryDate(24 * 60) : undefined,
                 accountInfo: { name, phone, gender, birthDate },
             });
+
+            if (!mailConfigured) {
+                return res.status(201).json({
+                    ...tokenResponse(newUser),
+                    msg: "accountReadyToSignIn",
+                    needsVerification: false,
+                });
+            }
 
             const verifyUrl = buildAuthLinks("verify", rawToken);
             const mail = await dispatchAuthMail(req, "verify", email, verifyUrl);
 
+            if (!mail.emailDelivered) {
+                newUser.isVerified = true;
+                newUser.verificationToken = undefined;
+                newUser.verificationExpires = undefined;
+                await newUser.save();
+                return res.status(201).json({
+                    ...tokenResponse(newUser),
+                    msg: "accountReadyToSignIn",
+                    needsVerification: false,
+                });
+            }
+
             return res.status(201).json({
                 success: true,
-                msg: "Account created. Check your email to verify your account.",
+                msg: "accountCreated",
                 user: {
                     name: newUser.accountInfo.name,
                     email: newUser.email,
@@ -102,24 +142,41 @@ authRoutes.post(
     validateResult,
     async (req, res, next) => {
         try {
-            const { email, password } = req.body;
-            const checkUser = await User.findOne({ email }).exec();
+            const email = normalizeAccountEmail(req.body.email);
+            const password = String(req.body.password ?? "");
+            const checkUser = await findAccount(email);
             if (!checkUser) {
-                return res.status(401).json({ success: false, msg: "Incorrect email or password" });
+                return res.status(401).json({
+                    success: false,
+                    code: "INVALID_CREDENTIALS",
+                    msg: "invalidCredentials",
+                });
             }
 
-            const checkPass = await bcrypt.compare(password, checkUser.password);
+            const checkPass = await passwordsMatch(password, checkUser.password);
             if (!checkPass) {
-                return res.status(401).json({ success: false, msg: "Incorrect email or password" });
+                return res.status(401).json({
+                    success: false,
+                    code: "INVALID_CREDENTIALS",
+                    msg: "invalidCredentials",
+                });
             }
 
             if (checkUser.isVerified === false) {
-                return res.status(403).json({
-                    success: false,
-                    msg: "Please verify your email before signing in.",
-                    needsVerification: true,
-                    email: checkUser.email,
-                });
+                if (!hasSmtp()) {
+                    checkUser.isVerified = true;
+                    checkUser.verificationToken = undefined;
+                    checkUser.verificationExpires = undefined;
+                    await checkUser.save();
+                } else {
+                    return res.status(403).json({
+                        success: false,
+                        code: "UNVERIFIED",
+                        msg: "needsVerification",
+                        needsVerification: true,
+                        email: checkUser.email,
+                    });
+                }
             }
 
             return res.json(tokenResponse(checkUser));
@@ -162,16 +219,16 @@ authRoutes.post(
 
 authRoutes.post(
     "/resend-verification",
-    body("email").isEmail().withMessage("Email must be valid").normalizeEmail(),
+    body("email").customSanitizer(normalizeAccountEmail).isEmail().withMessage("invalidEmail"),
     validateResult,
     async (req, res, next) => {
         try {
-            const user = await User.findOne({ email: req.body.email });
+            const user = await findAccount(req.body.email);
             if (!user) {
-                return res.json({ success: true, msg: "If that email exists, a new link was sent." });
+                return res.json({ success: true, msg: "verifyLinkIfExists" });
             }
             if (user.isVerified !== false) {
-                return res.json({ success: true, msg: "This account is already verified." });
+                return res.json({ success: true, msg: "alreadyVerified" });
             }
 
             const rawToken = createToken();
@@ -184,7 +241,7 @@ authRoutes.post(
 
             return res.json({
                 success: true,
-                msg: "If that email exists, a new link was sent.",
+                msg: "verifyLinkIfExists",
                 ...mail,
             });
         } catch (err) {
@@ -195,13 +252,13 @@ authRoutes.post(
 
 authRoutes.post(
     "/forgot-password",
-    body("email").isEmail().withMessage("Email must be valid").normalizeEmail(),
+    body("email").customSanitizer(normalizeAccountEmail).isEmail().withMessage("invalidEmail"),
     validateResult,
     async (req, res, next) => {
         try {
-            const user = await User.findOne({ email: req.body.email });
+            const user = await findAccount(req.body.email);
             if (!user) {
-                return res.json({ success: true, msg: "If that email exists, a reset link was sent." });
+                return res.json({ success: true, msg: "resetLinkIfExists" });
             }
 
             const rawToken = createToken();
@@ -214,7 +271,7 @@ authRoutes.post(
 
             return res.json({
                 success: true,
-                msg: "If that email exists, a reset link was sent.",
+                msg: "resetLinkIfExists",
                 ...mail,
             });
         } catch (err) {

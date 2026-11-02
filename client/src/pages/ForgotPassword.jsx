@@ -24,12 +24,13 @@ const ForgotPassword = () => {
     setLoading(true);
     setGeneralError("");
     try {
-      const { data: result } = await api.post("/auth/forgot-password", { email: data.email });
+      const { data: result } = await api.post("/auth/forgot-password", { email: data.email.trim() });
       setSuccess(true);
       setDevLink(result.devLink || "");
       setPreview(result.emailPreview || "");
-    } catch {
-      setGeneralError(t("sendResetFailed"));
+    } catch (error) {
+      const status = error.response?.status;
+      setGeneralError(t(status >= 500 ? "serverError" : "sendResetFailed"));
     } finally {
       setLoading(false);
     }

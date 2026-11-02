@@ -7,6 +7,7 @@ const baseURL = /^https?:\/\//.test(rawBase) && !rawBase.endsWith("/api")
 
 const api = axios.create({
   baseURL,
+  timeout: 20000,
 });
 
 api.interceptors.request.use((config) => {

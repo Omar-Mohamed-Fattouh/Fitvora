@@ -45,10 +45,22 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const login = async (token, userData) => {
+  const login = async (token, userData = {}) => {
+    const name = userData.name || userData.accountInfo?.name || "";
+    const email = userData.email || userData.accountInfo?.email || "";
     localStorage.setItem("authToken", token);
-    localStorage.setItem("userName", userData.name || "");
-    localStorage.setItem("userEmail", userData.email || "");
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userEmail", email);
+    setUser({
+      name,
+      email,
+      birthDate: userData.accountInfo?.birthDate,
+      isVerified: userData.isVerified !== false,
+    });
+    if (userData.healthInfo) {
+      setHealthInfo(userData.healthInfo);
+    }
+    setLoading(false);
     await fetchUserData();
   };
 

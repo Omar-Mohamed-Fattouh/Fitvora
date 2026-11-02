@@ -98,11 +98,11 @@ export function createApp() {
 
   app.use((err, _req, res, _next) => {
     const status = err.status || 500;
-    const message = err.message || "Something went wrong on the server.";
-    console.log(err);
+    console.error(err);
     res.status(status).json({
-      from: "from general handling middleware",
-      errorMsg: message,
+      success: false,
+      code: "SERVER_ERROR",
+      msg: "serverError",
     });
   });
 
