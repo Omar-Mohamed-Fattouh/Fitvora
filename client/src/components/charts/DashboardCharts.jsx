@@ -18,10 +18,13 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, BarController, LineController, ArcElement, Tooltip, Legend, Filler);
 
-const ink = "#1f2937";
-const muted = "#94a3b8";
-const indigo = "#3730a3";
-const rust = "#9a3412";
+const ink = "#161616";
+const muted = "rgba(22,22,22,.48)";
+const gold = "#8a7340";
+const teal = "#3d6b66";
+const rust = "#8c4a32";
+const olive = "#6a6848";
+const stone = "#8a8478";
 
 const baseOptions = {
   responsive: true,
@@ -31,13 +34,13 @@ const baseOptions = {
     legend: {
       display: true,
       position: "bottom",
-      labels: { boxWidth: 8, usePointStyle: true, font: { size: 11 }, color: ink },
+      labels: { boxWidth: 10, usePointStyle: true, font: { size: 12 }, color: ink, padding: 14 },
     },
     tooltip: { mode: "index", intersect: false },
   },
   scales: {
-    y: { beginAtZero: true, grid: { color: "rgba(15,23,42,.06)" }, ticks: { color: muted, font: { size: 10 } } },
-    x: { grid: { display: false }, ticks: { color: muted, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
+    y: { beginAtZero: true, grid: { color: "rgba(22,22,22,.06)" }, ticks: { color: muted, font: { size: 12 } } },
+    x: { grid: { display: false }, ticks: { color: muted, font: { size: 12 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
   },
 };
 
@@ -60,11 +63,11 @@ const DashboardCharts = ({ analytics }) => {
   const hasData = (analytics?.kpis?.sessions || 0) > 0 || weight.length > 0;
 
   const mixItems = [
-    ["mixCardio", mix.cardio, "#3730a3"],
-    ["mixStrength", mix.strength, "#1d4ed8"],
-    ["mixHiit", mix.hiit, "#9f1239"],
-    ["mixYoga", mix.yoga, "#047857"],
-    ["mixOther", mix.other, "#b45309"],
+    ["mixCardio", mix.cardio, teal],
+    ["mixStrength", mix.strength, ink],
+    ["mixHiit", mix.hiit, rust],
+    ["mixYoga", mix.yoga, olive],
+    ["mixOther", mix.other, stone],
   ];
   const mixTotal = mixItems.reduce((sum, item) => sum + item[1], 0) || 1;
 
@@ -76,7 +79,7 @@ const DashboardCharts = ({ analytics }) => {
     <div className="chart-grid" dir={lang === "ar" ? "rtl" : "ltr"}>
       <section className="dash-card span-8">
         <h3>{t("trainingLoad")}</h3>
-        <p>{t("thisPeriod")}</p>
+        <p>{t("chartLoadHint")}</p>
         <div className="chart-box tall">
           <Bar
             data={{
@@ -85,7 +88,7 @@ const DashboardCharts = ({ analytics }) => {
                 {
                   label: t("caloriesBurned"),
                   data: series.map((point) => point.burn),
-                  backgroundColor: "rgba(55,48,163,.85)",
+                  backgroundColor: ink,
                   borderRadius: 3,
                   yAxisID: "y",
                 },
@@ -93,8 +96,8 @@ const DashboardCharts = ({ analytics }) => {
                   type: "line",
                   label: t("sessionMinutes"),
                   data: series.map((point) => point.minutes),
-                  borderColor: rust,
-                  backgroundColor: "rgba(154,52,18,.08)",
+                  borderColor: gold,
+                  backgroundColor: "rgba(138,115,64,.12)",
                   tension: 0.35,
                   pointRadius: 0,
                   yAxisID: "y1",
@@ -105,7 +108,7 @@ const DashboardCharts = ({ analytics }) => {
               ...baseOptions,
               scales: {
                 ...baseOptions.scales,
-                y1: { position: "right", beginAtZero: true, grid: { display: false }, ticks: { color: muted, font: { size: 10 } } },
+                y1: { position: "right", beginAtZero: true, grid: { display: false }, ticks: { color: muted, font: { size: 12 } } },
               },
             }}
           />
@@ -114,7 +117,7 @@ const DashboardCharts = ({ analytics }) => {
 
       <section className="dash-card span-4">
         <h3>{t("workoutMix")}</h3>
-        <p>{t("thisPeriod")}</p>
+        <p>{t("chartMixHint")}</p>
         <ul className="mix-list">
           {mixItems.map(([key, value, color]) => (
             <li key={key}>
@@ -130,7 +133,7 @@ const DashboardCharts = ({ analytics }) => {
 
       <section className="dash-card span-6">
         <h3>{t("weightTrend")}</h3>
-        <p>{t("kpiWeight")}</p>
+        <p>{t("chartWeightHint")}</p>
         <div className="chart-box">
           {weight.length ? (
             <Line
@@ -139,12 +142,12 @@ const DashboardCharts = ({ analytics }) => {
                 datasets: [{
                   label: t("weight"),
                   data: weight.map((point) => point.value),
-                  borderColor: indigo,
-                  backgroundColor: "rgba(55,48,163,.08)",
+                  borderColor: teal,
+                  backgroundColor: "rgba(61,107,102,.12)",
                   fill: true,
                   tension: 0.3,
                   pointRadius: 2,
-                  pointBackgroundColor: indigo,
+                  pointBackgroundColor: teal,
                 }],
               }}
               options={{
@@ -164,7 +167,7 @@ const DashboardCharts = ({ analytics }) => {
 
       <section className="dash-card span-6">
         <h3>{t("energyBalance")}</h3>
-        <p>{t("caloriesIn")} / {t("caloriesBurned")}</p>
+        <p>{t("chartEnergyHint")}</p>
         <div className="chart-box">
           <Bar
             data={{
@@ -173,13 +176,13 @@ const DashboardCharts = ({ analytics }) => {
                 {
                   label: t("caloriesIn"),
                   data: series.map((point) => point.caloriesIn),
-                  backgroundColor: "rgba(15,23,42,.28)",
+                  backgroundColor: gold,
                   borderRadius: 3,
                 },
                 {
                   label: t("caloriesBurned"),
                   data: series.map((point) => point.burn),
-                  backgroundColor: "rgba(55,48,163,.85)",
+                  backgroundColor: ink,
                   borderRadius: 3,
                 },
               ],
@@ -191,7 +194,7 @@ const DashboardCharts = ({ analytics }) => {
 
       <section className="dash-card span-5">
         <h3>{t("weeklyVolume")}</h3>
-        <p>{t("caloriesBurned")}</p>
+        <p>{t("chartWeekHint")}</p>
         <div className="chart-box">
           <Bar
             data={{
@@ -199,7 +202,7 @@ const DashboardCharts = ({ analytics }) => {
               datasets: [{
                 label: t("caloriesBurned"),
                 data: weekly.map((week) => week.burn),
-                backgroundColor: "rgba(55,48,163,.8)",
+                backgroundColor: teal,
                 borderRadius: 3,
               }],
             }}

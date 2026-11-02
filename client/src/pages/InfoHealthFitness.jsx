@@ -155,6 +155,7 @@ const InfoHealthFitness = () => {
       { value: "130-160", label: t("height_130") },
       { value: "160-180", label: t("height_160") },
       { value: "180-200", label: t("height_180") },
+      { value: "200-220", label: t("height_200") },
     ],
     weight: [
       { value: "40-55", label: t("weight_40") },
@@ -163,6 +164,7 @@ const InfoHealthFitness = () => {
       { value: "85-100", label: t("weight_85") },
       { value: "100-120", label: t("weight_100") },
       { value: "120-140", label: t("weight_120") },
+      { value: "140-160", label: t("weight_140") },
     ],
     fitnessGoals: [
       { value: "weight-loss", label: t("weight-loss") },
@@ -170,6 +172,8 @@ const InfoHealthFitness = () => {
       { value: "endurance", label: t("endurance") },
       { value: "maintenance", label: t("maintenance") },
       { value: "rehabilitation", label: t("rehabilitation") },
+      { value: "mobility", label: t("mobility") },
+      { value: "recomposition", label: t("recomposition") },
     ],
     activityLevel: [
       { value: "sedentary", label: t("sedentary") },
@@ -184,8 +188,11 @@ const InfoHealthFitness = () => {
       { value: "diabetes", label: t("diabetes") },
       { value: "heart-disease", label: t("heart-disease") },
       { value: "asthma", label: t("asthma") },
+      { value: "joint-pain", label: t("joint-pain") },
+      { value: "thyroid", label: t("thyroid") },
     ],
     bodyFatPercentage: [
+      { value: "5-10", label: t("bodyfat_low") },
       { value: "10-15", label: t("bodyfat_athletic") },
       { value: "15-20", label: t("bodyfat_fitness") },
       { value: "20-25", label: t("bodyfat_average") },
@@ -199,6 +206,9 @@ const InfoHealthFitness = () => {
       { value: "yoga", label: t("yoga") },
       { value: "crossfit", label: t("crossfit") },
       { value: "sports", label: t("sports") },
+      { value: "pilates", label: t("pilates") },
+      { value: "swimming", label: t("swimming") },
+      { value: "cycling", label: t("cycling") },
     ],
     restingHeartRate: [
       { value: "40-60", label: t("rhr_athlete") },

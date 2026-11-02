@@ -255,7 +255,7 @@ userRoutes.patch(
     "/current/profile",
     tokenVerfication,
     body("name").optional().trim().isLength({ min: 3, max: 16 }).withMessage("Name must be between 3 and 16 characters"),
-    body("phone").optional().isString().isLength({ min: 7, max: 20 }),
+    body("phone").optional().isString().isLength({ min: 8, max: 16 }),
     validateResult,
     async (req, res, next) => {
         try {

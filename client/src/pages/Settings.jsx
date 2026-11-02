@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import { useUser } from "../contexts/UserContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import LanguageToggle from "../components/LanguageToggle";
 import Seo from "../components/Seo";
+import PhoneField, { isValidPhoneNumber } from "../components/PhoneField";
+import PasswordReveal from "../components/PasswordReveal";
 
 const passwordSchema = yup.object({
   currPassword: yup.string().required("passwordRequired"),
@@ -17,7 +19,7 @@ const passwordSchema = yup.object({
 
 const profileSchema = yup.object({
   name: yup.string().min(3).max(16).required("nameRequired"),
-  phone: yup.string().min(7).max(20).required("phoneRequired"),
+  phone: yup.string().required("phoneRequired").test("phone", "phoneInvalid", (value) => Boolean(value && isValidPhoneNumber(value))),
 });
 
 const Settings = () => {
@@ -26,8 +28,10 @@ const Settings = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ resolver: yupResolver(passwordSchema) });
-  const { register: registerProfile, handleSubmit: handleProfile, formState: { errors: profileErrors } } = useForm({
+  const { register: registerProfile, control: profileControl, handleSubmit: handleProfile, formState: { errors: profileErrors } } = useForm({
     resolver: yupResolver(profileSchema),
     values: { name: user?.name || "", phone: user?.phone || "" },
   });
@@ -36,8 +40,8 @@ const Settings = () => {
     setError("");
     setMessage("");
     try {
-      const { data: result } = await api.patch("/users/current/password", data);
-      setMessage(result.msg);
+      await api.patch("/users/current/password", data);
+      setMessage(t("passwordUpdated"));
       reset();
     } catch {
       setError(t("couldNotUpdatePassword"));
@@ -48,8 +52,8 @@ const Settings = () => {
     setError("");
     setMessage("");
     try {
-      const { data: result } = await api.patch("/users/current/profile", data);
-      setMessage(result.msg);
+      await api.patch("/users/current/profile", data);
+      setMessage(t("profileUpdated"));
       await refreshUserData();
     } catch {
       setError(t("couldNotUpdateProfile"));
@@ -90,10 +94,24 @@ const Settings = () => {
         </dl>
         <form onSubmit={handleProfile(onProfile)} className="contact-form" style={{ marginTop: "1rem" }}>
           <label className="field-label" htmlFor="profile-name">{t("name")}</label>
-          <input id="profile-name" className="field" {...registerProfile("name")} />
+          <input id="profile-name" className="field" placeholder={t("placeholderName")} {...registerProfile("name")} />
           {profileErrors.name && <p className="notice bad">{t(profileErrors.name.message)}</p>}
           <label className="field-label" htmlFor="profile-phone">{t("phone")}</label>
-          <input id="profile-phone" className="field" {...registerProfile("phone")} />
+          <Controller
+            name="phone"
+            control={profileControl}
+            render={({ field }) => (
+              <PhoneField
+                id="profile-phone"
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={Boolean(profileErrors.phone)}
+                placeholder={t("placeholderPhone")}
+              />
+            )}
+          />
           {profileErrors.phone && <p className="notice bad">{t(profileErrors.phone.message)}</p>}
           <button type="submit" className="ink-btn">{t("saveProfile")}</button>
         </form>
@@ -103,13 +121,19 @@ const Settings = () => {
         <h3>{t("changePassword")}</h3>
         <form onSubmit={handleSubmit(onPassword)} className="contact-form">
           <label className="field-label" htmlFor="curr-pass">{t("currentPassword")}</label>
-          <input id="curr-pass" type="password" className="field" {...register("currPassword")} />
+          <div className="field-wrap">
+            <input id="curr-pass" type={showCurrent ? "text" : "password"} className="field" placeholder={t("placeholderCurrentPassword")} {...register("currPassword")} />
+            <PasswordReveal show={showCurrent} onToggle={() => setShowCurrent((value) => !value)} showLabel={t("showPassword")} hideLabel={t("hidePassword")} />
+          </div>
           {errors.currPassword && <p className="notice bad">{t(errors.currPassword.message)}</p>}
           <label className="field-label" htmlFor="new-pass">{t("newPassword")}</label>
-          <input id="new-pass" type="password" className="field" {...register("newPassword")} />
+          <div className="field-wrap">
+            <input id="new-pass" type={showNew ? "text" : "password"} className="field" placeholder={t("placeholderNewPassword")} {...register("newPassword")} />
+            <PasswordReveal show={showNew} onToggle={() => setShowNew((value) => !value)} showLabel={t("showPassword")} hideLabel={t("hidePassword")} />
+          </div>
           {errors.newPassword && <p className="notice bad">{t(errors.newPassword.message)}</p>}
           <label className="field-label" htmlFor="confirm-pass">{t("confirmNewPassword")}</label>
-          <input id="confirm-pass" type="password" className="field" {...register("confirmNewPassword")} />
+          <input id="confirm-pass" type="password" className="field" placeholder={t("placeholderConfirmPassword")} {...register("confirmNewPassword")} />
           {errors.confirmNewPassword && <p className="notice bad">{t(errors.confirmNewPassword.message)}</p>}
           <button type="submit" className="ink-btn">{t("updatePassword")}</button>
         </form>

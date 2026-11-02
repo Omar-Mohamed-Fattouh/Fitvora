@@ -60,19 +60,19 @@ export const healthDataValidation = [
     body('height')
         .isString()
         .trim()
-        .isIn(["100-130", "130-160", "160-180", "180-200"])
-        .withMessage('Height must be one of: 100-130, 130-160, 160-180, 180-200'),
+        .isIn(["100-130", "130-160", "160-180", "180-200", "200-220"])
+        .withMessage('Height must be one of the allowed ranges'),
 
     body('weight')
         .isString()
         .trim()
-        .isIn(["40-55", "55-70", "70-85", "85-100", "100-120", "120-140"])
+        .isIn(["40-55", "55-70", "70-85", "85-100", "100-120", "120-140", "140-160"])
         .withMessage('Weight must be one of the allowed ranges'),
 
     body('fitnessGoals')
         .isString()
         .trim()
-        .isIn(["weight-loss", "muscle-gain", "endurance", "maintenance", "rehabilitation"])
+        .isIn(["weight-loss", "muscle-gain", "endurance", "maintenance", "rehabilitation", "mobility", "recomposition"])
         .withMessage('Invalid fitness goal'),
 
     body('activityLevel')
@@ -84,19 +84,19 @@ export const healthDataValidation = [
     body('healthConditions')
         .isString()
         .trim()
-        .isIn(["none", "hypertension", "diabetes", "heart-disease", "asthma"])
+        .isIn(["none", "hypertension", "diabetes", "heart-disease", "asthma", "joint-pain", "thyroid"])
         .withMessage('Invalid health condition'),
 
     body('bodyFatPercentage')
         .isString()
         .trim()
-        .isIn(["10-15", "15-20", "20-25", "25-30", "30+"])
+        .isIn(["5-10", "10-15", "15-20", "20-25", "25-30", "30+"])
         .withMessage('Invalid body fat percentage'),
 
     body('preferredWorkoutType')
         .isString()
         .trim()
-        .isIn(["cardio", "strength", "hiit", "yoga", "crossfit", "sports"])
+        .isIn(["cardio", "strength", "hiit", "yoga", "crossfit", "sports", "pilates", "swimming", "cycling"])
         .withMessage('Invalid workout type'),
 
     body('restingHeartRate')

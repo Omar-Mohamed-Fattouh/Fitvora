@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../lib/api";
 import { useLanguage } from "../contexts/LanguageContext";
+import PasswordReveal from "../components/PasswordReveal";
 
 const schema = yup.object({
   password: yup.string().min(8, "passwordMin").matches(/\d/, "passwordNumber").matches(/[A-Z]/, "passwordUpper").matches(/[@$!%*?&]/, "passwordSpecial").required("passwordRequired"),
@@ -47,18 +48,24 @@ const ResetPassword = () => {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <label className="field-label" htmlFor="password">{t("newPassword")}</label>
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            {...register("password")}
-            className={`field ${errors.password ? "is-bad" : ""}`}
-          />
-          <button type="button" className="text-btn" onClick={() => setShowPassword((v) => !v)}>
-            {showPassword ? t("hidePassword") : t("showPassword")}
-          </button>
+          <div className="field-wrap">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder={t("placeholderNewPassword")}
+              {...register("password")}
+              className={`field ${errors.password ? "is-bad" : ""}`}
+            />
+            <PasswordReveal
+              show={showPassword}
+              onToggle={() => setShowPassword((value) => !value)}
+              showLabel={t("showPassword")}
+              hideLabel={t("hidePassword")}
+            />
+          </div>
           {errors.password && <p className="notice bad">{t(errors.password.message)}</p>}
           <label className="field-label" htmlFor="confirmPassword">{t("confirmPassword")}</label>
-          <input id="confirmPassword" type="password" {...register("confirmPassword")} className={`field ${errors.confirmPassword ? "is-bad" : ""}`} />
+          <input id="confirmPassword" type="password" placeholder={t("placeholderConfirmPassword")} {...register("confirmPassword")} className={`field ${errors.confirmPassword ? "is-bad" : ""}`} />
           {errors.confirmPassword && <p className="notice bad">{t(errors.confirmPassword.message)}</p>}
           <button type="submit" disabled={loading || !token} className="ink-btn wide">
             {loading ? t("updating") : t("updatePasswordBtn")}

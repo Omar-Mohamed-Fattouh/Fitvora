@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useState, useEffect } from "react";
@@ -8,19 +8,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useUser } from "../contexts/UserContext";
 import Seo from "../components/Seo";
-
-function toE164(phone) {
-  let value = String(phone || "").trim().replace(/[^\d+]/g, "");
-  if (value.startsWith("00")) value = `+${value.slice(2)}`;
-  if (/^01\d{9}$/.test(value)) value = `+2${value}`;
-  if (/^1\d{9}$/.test(value)) value = `+20${value}`;
-  if (value && !value.startsWith("+")) value = `+${value}`;
-  return value;
-}
+import PhoneField, { isValidPhoneNumber } from "../components/PhoneField";
+import PasswordReveal from "../components/PasswordReveal";
 
 const signUpSchema = yup.object().shape({
   fullName: yup.string().max(16).required("nameRequired"),
-  phoneNumber: yup.string().required("phoneRequired"),
+  phoneNumber: yup
+    .string()
+    .required("phoneRequired")
+    .test("phone", "phoneInvalid", (value) => Boolean(value && isValidPhoneNumber(value))),
   gender: yup.string().required("genderRequired"),
   dateOfBirth: yup
     .date()
@@ -64,6 +60,7 @@ const SignUpForm = () => {
 
   const {
     register,
+    control,
     handleSubmit,
     trigger,
     setError,
@@ -71,7 +68,8 @@ const SignUpForm = () => {
     watch
   } = useForm({
     resolver: yupResolver(signUpSchema),
-    mode: "onChange"
+    mode: "onChange",
+    defaultValues: { phoneNumber: "" },
   });
 
   useEffect(() => {
@@ -103,7 +101,7 @@ const SignUpForm = () => {
         name: data.fullName,
         email: data.email.trim(),
         password: data.password,
-        phone: toE164(data.phoneNumber),
+        phone: data.phoneNumber,
         gender: data.gender,
         birthDate: data.dateOfBirth instanceof Date
           ? data.dateOfBirth.toISOString().split("T")[0]
@@ -186,11 +184,7 @@ const SignUpForm = () => {
   };
 
   const passwordStrength = getPasswordStrength(password);
-  const strengthColor = {
-    Weak: 'bg-red-500',
-    Medium: 'bg-yellow-500',
-    Strong: 'bg-green-500',
-  }[passwordStrength];
+  const strengthWidth = { Weak: 33, Medium: 66, Strong: 100 }[passwordStrength] || 0;
 
   const nextStep = async () => {
     const valid = await trigger(["fullName", "phoneNumber", "gender", "dateOfBirth"]);
@@ -232,6 +226,7 @@ const SignUpForm = () => {
               autoComplete="name"
               {...register("fullName")}
               className={`field ${errors.fullName || fieldErrors.fullName ? "is-bad" : ""}`}
+              placeholder={t("placeholderName")}
             />
             {(errors.fullName || fieldErrors.fullName) && (
               <p className="field-error" role="alert">{t(errors.fullName?.message || fieldErrors.fullName)}</p>
@@ -240,14 +235,20 @@ const SignUpForm = () => {
 
           <div>
             <label htmlFor="phoneNumber" className="field-label">{t("phoneNumber")}</label>
-            <input
-              id="phoneNumber"
-              type="tel"
-              autoComplete="tel"
-              inputMode="tel"
-              {...register("phoneNumber")}
-              className={`field ${errors.phoneNumber || fieldErrors.phoneNumber ? "is-bad" : ""}`}
-              placeholder="+20 10 0000 0000"
+            <Controller
+              name="phoneNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneField
+                  id="phoneNumber"
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  invalid={Boolean(errors.phoneNumber || fieldErrors.phoneNumber)}
+                  placeholder={t("placeholderPhone")}
+                />
+              )}
             />
             {(errors.phoneNumber || fieldErrors.phoneNumber) && (
               <p className="field-error" role="alert">{t(errors.phoneNumber?.message || fieldErrors.phoneNumber)}</p>
@@ -297,7 +298,7 @@ const SignUpForm = () => {
               autoComplete="email"
               {...register("email")}
               className={`field ${errors.email || fieldErrors.email ? "is-bad" : ""}`}
-              placeholder="example@gmail.com"
+              placeholder={t("placeholderEmail")}
             />
             {(errors.email || fieldErrors.email) && (
               <p className="field-error" role="alert">{t(errors.email?.message || fieldErrors.email)}</p>
@@ -313,19 +314,18 @@ const SignUpForm = () => {
                 autoComplete="new-password"
                 {...register("password")}
                 className={`field ${errors.password || fieldErrors.password ? "is-bad" : ""}`}
-                style={{ paddingInlineEnd: "4.5rem", paddingInlineStart: "0.7rem" }}
+                placeholder={t("placeholderPassword")}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-btn field-reveal"
-              >
-                {showPassword ? t("hidePassword") : t("showPassword")}
-              </button>
+              <PasswordReveal
+                show={showPassword}
+                onToggle={() => setShowPassword((value) => !value)}
+                showLabel={t("showPassword")}
+                hideLabel={t("hidePassword")}
+              />
             </div>
             {password && (
               <div className="meter" aria-hidden="true" style={{ marginTop: "0.45rem" }}>
-                <span style={{ width: `${({ Weak: 33, Medium: 66, Strong: 100 }[passwordStrength] || 0)}%` }} className={strengthColor} />
+                <span style={{ width: `${strengthWidth}%` }} />
               </div>
             )}
             {(errors.password || fieldErrors.password) && (
@@ -342,15 +342,14 @@ const SignUpForm = () => {
                 autoComplete="new-password"
                 {...register("confirmPassword")}
                 className={`field ${errors.confirmPassword || fieldErrors.confirmPassword ? "is-bad" : ""}`}
-                style={{ paddingInlineEnd: "4.5rem", paddingInlineStart: "0.7rem" }}
+                placeholder={t("placeholderConfirmPassword")}
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="text-btn field-reveal"
-              >
-                {showConfirmPassword ? t("hidePassword") : t("showPassword")}
-              </button>
+              <PasswordReveal
+                show={showConfirmPassword}
+                onToggle={() => setShowConfirmPassword((value) => !value)}
+                showLabel={t("showPassword")}
+                hideLabel={t("hidePassword")}
+              />
             </div>
             {(errors.confirmPassword || fieldErrors.confirmPassword) && (
               <p className="field-error" role="alert">{t(errors.confirmPassword?.message || fieldErrors.confirmPassword)}</p>

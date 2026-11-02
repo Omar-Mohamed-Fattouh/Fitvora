@@ -133,22 +133,41 @@ export function buildDailyPlan(healthInfo = {}) {
       { id: "am-walk", titleKey: "workout_am_walk", title: "Brisk Morning Walk", type: "cardio", duration: 25, calories: 180 },
       { id: "hiit", titleKey: "workout_hiit", title: "Fat-Burn HIIT", type: "hiit", duration: 20, calories: 240 },
       { id: "core", titleKey: "workout_core", title: "Core Finisher", type: "strength", duration: 12, calories: 80 },
+      { id: "cycle", titleKey: "workout_cycle", title: "Easy Cycle", type: "cardio", duration: 20, calories: 160 },
     ],
     "muscle-gain": [
       { id: "push", titleKey: "workout_push", title: "Upper Body Strength", type: "strength", duration: 40, calories: 260 },
+      { id: "legs", titleKey: "workout_legs", title: "Lower Body Strength", type: "strength", duration: 35, calories: 240 },
       { id: "walk", titleKey: "workout_walk", title: "Recovery Walk", type: "cardio", duration: 15, calories: 90 },
       { id: "protein", titleKey: "workout_protein", title: "High-Protein Meal Prep", type: "nutrition", duration: 20, calories: 0 },
     ],
     endurance: [
       { id: "run", titleKey: "workout_run", title: "Steady Run", type: "cardio", duration: 35, calories: 320 },
+      { id: "row", titleKey: "workout_row", title: "Row Intervals", type: "cardio", duration: 18, calories: 210 },
       { id: "mobility", titleKey: "workout_mobility", title: "Mobility Flow", type: "yoga", duration: 15, calories: 70 },
+      { id: "core", titleKey: "workout_core", title: "Core Finisher", type: "strength", duration: 10, calories: 70 },
     ],
     rehabilitation: [
       { id: "mobility", titleKey: "workout_gentle", title: "Gentle Mobility", type: "yoga", duration: 20, calories: 60 },
       { id: "walk", titleKey: "workout_easy", title: "Easy Walk", type: "cardio", duration: 15, calories: 70 },
+      { id: "core", titleKey: "workout_core_easy", title: "Supported Core", type: "strength", duration: 10, calories: 40 },
+      { id: "stretch", titleKey: "workout_stretch", title: "Evening Stretch", type: "yoga", duration: 12, calories: 50 },
+    ],
+    mobility: [
+      { id: "flow", titleKey: "workout_mobility", title: "Mobility Flow", type: "yoga", duration: 25, calories: 90 },
+      { id: "walk", titleKey: "workout_easy", title: "Easy Walk", type: "cardio", duration: 20, calories: 90 },
+      { id: "stretch", titleKey: "workout_stretch", title: "Evening Stretch", type: "yoga", duration: 12, calories: 50 },
+    ],
+    recomposition: [
+      { id: "push", titleKey: "workout_push", title: "Upper Body Strength", type: "strength", duration: 35, calories: 230 },
+      { id: "hiit", titleKey: "workout_hiit", title: "Fat-Burn HIIT", type: "hiit", duration: 16, calories: 200 },
+      { id: "walk", titleKey: "workout_walk", title: "Recovery Walk", type: "cardio", duration: 15, calories: 90 },
+      { id: "core", titleKey: "workout_core", title: "Core Finisher", type: "strength", duration: 10, calories: 70 },
     ],
     maintenance: [
       { id: "balanced", titleKey: "workout_balanced", title: "Balanced Full Body", type: type === "cardio" ? "cardio" : "strength", duration: 30, calories: 200 },
+      { id: "walk", titleKey: "workout_walk", title: "Recovery Walk", type: "cardio", duration: 20, calories: 110 },
+      { id: "core", titleKey: "workout_core", title: "Core Finisher", type: "strength", duration: 12, calories: 80 },
       { id: "stretch", titleKey: "workout_stretch", title: "Evening Stretch", type: "yoga", duration: 12, calories: 50 },
     ],
   };

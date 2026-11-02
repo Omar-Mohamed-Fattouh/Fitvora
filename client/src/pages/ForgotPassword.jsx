@@ -53,7 +53,7 @@ const ForgotPassword = () => {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <label className="field-label" htmlFor="email">{t("emailAddress")}</label>
-          <input id="email" type="email" {...register("email")} className={`field ${errors.email ? "is-bad" : ""}`} />
+          <input id="email" type="email" placeholder={t("placeholderEmail")} {...register("email")} className={`field ${errors.email ? "is-bad" : ""}`} />
           {errors.email && <p className="notice bad">{t(errors.email.message)}</p>}
           <button type="submit" disabled={loading} className="ink-btn wide">{loading ? t("sendingLink") : t("sendReset")}</button>
         </form>

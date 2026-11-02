@@ -8,6 +8,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import Seo from "../components/Seo";
+import PasswordReveal from "../components/PasswordReveal";
+
+const DEMO_EMAIL = "omarmfattouh45@gmail.com";
+const DEMO_PASSWORD = "Omar01284$$";
 
 const loginSchema = yup.object({
   email: yup.string().email("invalidEmail").required("emailRequired"),
@@ -31,6 +35,10 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(loginSchema),
     mode: "onTouched",
+    defaultValues: {
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    },
   });
 
   const onSubmit = async (data) => {
@@ -94,7 +102,7 @@ const Login = () => {
             autoComplete="username"
             {...register("email")}
             className={`field ${errors.email ? "is-bad" : ""}`}
-            placeholder="your@email.com"
+            placeholder={t("placeholderEmail")}
             aria-invalid={errors.email ? "true" : "false"}
             aria-describedby="email-error"
           />
@@ -114,19 +122,16 @@ const Login = () => {
               autoComplete="current-password"
               {...register("password")}
               className={`field ${errors.password ? "is-bad" : ""}`}
-              placeholder="••••••••"
+              placeholder={t("placeholderPassword")}
               aria-invalid={errors.password ? "true" : "false"}
               aria-describedby="password-error"
-              style={{ paddingInlineEnd: "2.4rem" }}
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-btn field-reveal"
-              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
-            >
-              {showPassword ? t("hidePassword") : t("showPassword")}
-            </button>
+            <PasswordReveal
+              show={showPassword}
+              onToggle={() => setShowPassword((value) => !value)}
+              showLabel={t("showPassword")}
+              hideLabel={t("hidePassword")}
+            />
           </div>
           {errors.password && (
             <p id="password-error" className="field-error" role="alert">
@@ -136,14 +141,13 @@ const Login = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
+          <div className="auth-remember">
             <input
               id="remember-me"
               name="remember-me"
               type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
             />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+            <label htmlFor="remember-me" className="field-label" style={{ margin: 0 }}>
               {t("rememberMe")}
             </label>
           </div>

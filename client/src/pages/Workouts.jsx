@@ -12,6 +12,7 @@ const Workouts = () => {
   const [message, setMessage] = useState("");
   const [muscle, setMuscle] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [kind, setKind] = useState("all");
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -69,9 +70,15 @@ const Workouts = () => {
     [exercises]
   );
 
+  const kinds = useMemo(
+    () => ["all", ...new Set(exercises.map((item) => item.type).filter(Boolean))],
+    [exercises]
+  );
+
   const visible = exercises.filter((exercise) => (
     (muscle === "all" || exercise.muscle === muscle) &&
-    (difficulty === "all" || exercise.difficulty === difficulty)
+    (difficulty === "all" || exercise.difficulty === difficulty) &&
+    (kind === "all" || exercise.type === kind)
   ));
 
   const done = plans.filter((item) => item.completed).length;
@@ -123,6 +130,13 @@ const Workouts = () => {
             </button>
           ))}
         </div>
+        <div className="chip-row" style={{ marginBottom: "0.6rem" }}>
+          {kinds.map((item) => (
+            <button key={item} type="button" onClick={() => setKind(item)} aria-pressed={kind === item} className={`chip ${kind === item ? "is-on" : ""}`}>
+              {t(item)}
+            </button>
+          ))}
+        </div>
         <div className="chip-row" style={{ marginBottom: "0.9rem" }}>
           {["all", "beginner", "intermediate", "advanced"].map((item) => (
             <button key={item} type="button" onClick={() => setDifficulty(item)} aria-pressed={difficulty === item} className={`chip ${difficulty === item ? "is-on" : ""}`}>
@@ -130,17 +144,21 @@ const Workouts = () => {
             </button>
           ))}
         </div>
-        <div className="catalog-grid cols-3">
-          {visible.map((exercise) => (
-            <article key={exercise._id} className="item-card">
-              <h3>{t(exercise.nameKey || exercise.name)}</h3>
-              <p className="dash-muted">{t(exercise.muscle)} · {t(exercise.difficulty)} · {exercise.duration || 8} {t("min")}</p>
-              {(exercise.instructionsKey || exercise.instructions) && (
-                <p>{t(exercise.instructionsKey || exercise.instructions)}</p>
-              )}
-            </article>
-          ))}
-        </div>
+        {visible.length === 0 ? (
+          <p className="dash-muted">{t("emptyLibrary")}</p>
+        ) : (
+          <div className="catalog-grid cols-3">
+            {visible.map((exercise) => (
+              <article key={exercise._id} className="item-card">
+                <h3>{t(exercise.nameKey || exercise.name)}</h3>
+                <p className="dash-muted">{t(exercise.muscle)} · {t(exercise.equipment || "bodyweight")} · {t(exercise.difficulty)} · {exercise.duration || 8} {t("min")}</p>
+                {(exercise.instructionsKey || exercise.instructions) && (
+                  <p>{t(exercise.instructionsKey || exercise.instructions)}</p>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
